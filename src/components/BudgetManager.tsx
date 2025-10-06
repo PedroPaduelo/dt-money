@@ -66,7 +66,7 @@ export default function BudgetManager({
   const getBudgetStatus = (percentage: number) => {
     if (percentage >= 100) return { color: 'text-brandRed', bg: 'bg-red-900/20' }
     if (percentage >= 80) return { color: 'text-yellow-500', bg: 'bg-yellow-900/20' }
-    return { color: 'text-igniteLight', bg: 'bg-green-900/20' }
+    return { color: 'text-ignitLight', bg: 'bg-green-900/20' }
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -103,7 +103,7 @@ export default function BudgetManager({
         <h3 className="text-xl font-bold text-titles">Orçamentos</h3>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-igniteMid hover:bg-igniteLight transition-colors px-4 py-2 rounded-lg text-white font-medium text-sm"
+          className="bg-orange-500 hover:bg-orange-600 transition-colors px-4 py-2 rounded-lg text-white font-medium text-sm"
         >
           Novo Orçamento
         </button>
@@ -155,7 +155,7 @@ export default function BudgetManager({
                     <div
                       className={`h-2 rounded-full transition-all duration-300 ${
                         utilization?.percentage >= 100 ? 'bg-brandRed' :
-                        utilization?.percentage >= 80 ? 'bg-yellow-500' : 'bg-igniteLight'
+                        utilization?.percentage >= 80 ? 'bg-yellow-500' : 'bg-ignitLight'
                       }`}
                       style={{ width: `${Math.min(utilization?.percentage || 0, 100)}%` }}
                     />
@@ -174,7 +174,7 @@ export default function BudgetManager({
                 {utilization && (
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray300">Saldo</span>
-                    <span className={`font-medium ${utilization.spent > budget.amount ? 'text-brandRed' : 'text-igniteLight'}`}>
+                    <span className={`font-medium ${utilization.spent > budget.amount ? 'text-brandRed' : 'text-ignitLight'}`}>
                       {formatCurrency(budget.amount - utilization.spent)}
                     </span>
                   </div>
@@ -204,7 +204,7 @@ export default function BudgetManager({
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-4 py-3 bg-shapeSecondary border border-shapeTertiary rounded-lg text-textBase focus:outline-none focus:ring-2 focus:ring-igniteLight"
+                  className="w-full px-4 py-3 bg-shapeSecondary border border-shapeTertiary rounded-lg text-textBase focus:outline-none focus:ring-2 focus:ring-ignitLight"
                   required
                 >
                   <option value="">Selecione uma categoria</option>
@@ -220,7 +220,7 @@ export default function BudgetManager({
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full px-4 py-3 bg-shapeSecondary border border-shapeTertiary rounded-lg text-textBase placeholder-placeholder focus:outline-none focus:ring-2 focus:ring-igniteLight"
+                  className="w-full px-4 py-3 bg-shapeSecondary border border-shapeTertiary rounded-lg text-textBase placeholder-placeholder focus:outline-none focus:ring-2 focus:ring-ignitLight"
                   placeholder="0,00"
                   step="0.01"
                   required
@@ -232,7 +232,7 @@ export default function BudgetManager({
                 <select
                   value={period}
                   onChange={(e) => setPeriod(e.target.value as 'monthly' | 'yearly')}
-                  className="w-full px-4 py-3 bg-shapeSecondary border border-shapeTertiary rounded-lg text-textBase focus:outline-none focus:ring-2 focus:ring-igniteLight"
+                  className="w-full px-4 py-3 bg-shapeSecondary border border-shapeTertiary rounded-lg text-textBase focus:outline-none focus:ring-2 focus:ring-ignitLight"
                 >
                   <option value="monthly">Mensal</option>
                   <option value="yearly">Anual</option>
@@ -249,7 +249,7 @@ export default function BudgetManager({
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-3 px-4 bg-igniteLight text-white rounded-lg hover:bg-igniteMid transition-colors"
+                  className="flex-1 py-3 px-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
                 >
                   {editingBudget ? 'Atualizar' : 'Cadastrar'}
                 </button>
