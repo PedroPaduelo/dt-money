@@ -22,7 +22,7 @@ function Header({ onNewTransaction, onLoadMockData }: HeaderProps) {
           {onLoadMockData && (
             <button
               onClick={onLoadMockData}
-              className="bg-shapeTertiary hover:bg-shapeSecondary transition-colors px-5 py-3 rounded-md text-textBase font-medium"
+              className="bg-orange-500 hover:bg-orange-600 transition-colors px-5 py-3 rounded-md text-textBase font-medium"
               title="Carregar dados de exemplo"
             >
               Carregar dados mockados
@@ -30,7 +30,7 @@ function Header({ onNewTransaction, onLoadMockData }: HeaderProps) {
           )}
           <button
             onClick={onNewTransaction}
-            className="bg-igniteMid hover:bg-igniteLight transition-colors px-5 py-3 rounded-md text-white font-medium"
+            className="bg-orange-500 hover:bg-orange-600 transition-colors px-5 py-3 rounded-md text-white font-medium"
           >
             Nova transação
           </button>
