@@ -49,8 +49,6 @@ const Layout: React.FC = () => {
     isReady
   } = useIndexedDB()
 
-  // ... (keep all existing functions from App.tsx)
-  
   const initializeDefaultCategories = async () => {
     try {
       const existingCategories = await getCategories()
