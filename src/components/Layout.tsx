@@ -4,10 +4,64 @@ import Header from "./Header";
 import Summary from "./Summary";
 import NewTransactionModal from "./NewTransactionModal";
 import Transactions from "./Transactions";
+import { useIndexedDB } from "../hooks/useIndexedDB";
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showNewTransactionModal, setShowNewTransactionModal] = useState(false);
+  
+  // Hook para integração com IndexedDB
+  const { getTransactions, isReady, getCategories } = useIndexedDB();
+  
+  // Estado para armazenar dados reais
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    // Carregar dados quando o banco estiver pronto
+    if (isReady) {
+      loadData();
+    }
+  }, [isReady]);
+
+  const loadData = async () => {
+    try {
+      // Carregar transações
+      const transactionsData = await getTransactions();
+      setTransactions(transactionsData);
+      
+      // Carregar categorias
+      const categoriesData = await getCategories();
+      const categoryNames = categoriesData.map(cat => cat.name);
+      setCategories(categoryNames);
+      
+      console.log('DT Money - Dados carregados com sucesso!');
+      console.log('Transações:', transactionsData);
+      console.log('Categorias:', categoryNames);
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error);
+      // Dados mock em caso de erro
+      setTransactions([
+        {
+          id: '1',
+          description: 'Salário',
+          price: 5000,
+          category: 'Salário',
+          date: new Date().toISOString(),
+          type: 'income' as const
+        },
+        {
+          id: '2', 
+          description: 'Aluguel',
+          price: 1500,
+          category: 'Moradia',
+          date: new Date().toISOString(),
+          type: 'outcome' as const
+        }
+      ]);
+      setCategories(['Salário', 'Alimentação', 'Moradia', 'Transporte', 'Lazer']);
+    }
+  };
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -18,28 +72,6 @@ const Layout = () => {
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
   }, []);
-
-  // Mock data for demonstration - você pode substituir com dados reais
-  const mockTransactions = [
-    {
-      id: '1',
-      description: 'Salário',
-      price: 5000,
-      category: 'Salário',
-      date: new Date().toISOString(),
-      type: 'income' as const
-    },
-    {
-      id: '2', 
-      description: 'Aluguel',
-      price: 1500,
-      category: 'Moradia',
-      date: new Date().toISOString(),
-      type: 'outcome' as const
-    }
-  ];
-
-  const mockCategories = ['Salário', 'Alimentação', 'Moradia', 'Transporte', 'Lazer'];
 
   const handleEditTransaction = (transaction: any) => {
     console.log('Edit transaction:', transaction);
@@ -54,6 +86,11 @@ const Layout = () => {
   const handleSearch = (filters: any) => {
     console.log('Search filters:', filters);
     // Implementar lógica de busca
+  };
+
+  const handleTransactionSuccess = () => {
+    // Recarregar dados quando uma nova transação for adicionada
+    loadData();
   };
 
   return (
@@ -108,11 +145,11 @@ const Layout = () => {
           <main className="flex-1">
             <Summary />
             <Transactions 
-              transactions={mockTransactions}
+              transactions={transactions}
               onEdit={handleEditTransaction}
               onDelete={handleDeleteTransaction}
               onSearch={handleSearch}
-              categories={mockCategories}
+              categories={categories}
             />
           </main>
         </div>
@@ -121,7 +158,8 @@ const Layout = () => {
       {/* New Transaction Modal */}
       {showNewTransactionModal && (
         <NewTransactionModal 
-          onClose={() => setShowNewTransactionModal(false)} 
+          onClose={() => setShowNewTransactionModal(false)}
+          onSuccess={handleTransactionSuccess}
         />
       )}
     </div>
