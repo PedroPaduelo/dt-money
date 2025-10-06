@@ -46,7 +46,7 @@ export default function TransactionActions({ transaction, onEdit, onDelete }: Tr
         <div className="p-4">
           <div className="mb-3 pb-3 border-b border-shapeTertiary">
             <p className="font-medium text-titles text-sm">{transaction.description}</p>
-            <p className={`text-xs ${transaction.price > 0 ? 'text-igniteLight' : 'text-brandRed'}`}>
+            <p className={`text-xs ${transaction.price > 0 ? 'text-ignitLight' : 'text-brandRed'}`}>
               {formatCurrency(transaction.price)}
             </p>
             <p className="text-xs text-gray300">{formatDate(transaction.date)}</p>
@@ -55,7 +55,7 @@ export default function TransactionActions({ transaction, onEdit, onDelete }: Tr
           <div className="space-y-2">
             <button
               onClick={() => onEdit(transaction)}
-              className="w-full text-left px-3 py-2 text-sm text-textBase hover:bg-shapeTertiary rounded transition-colors flex items-center gap-2"
+              className="w-full text-left px-3 py-2 text-sm text-textBase hover:bg-orange-500 hover:text-white rounded transition-colors flex items-center gap-2"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M11.333 2L13.9997 4.66667L5.66634 13L2.99967 13L2.99967 10.3333L11.333 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -65,7 +65,7 @@ export default function TransactionActions({ transaction, onEdit, onDelete }: Tr
 
             <button
               onClick={() => setShowConfirm(true)}
-              className="w-full text-left px-3 py-2 text-sm text-brandRed hover:bg-shapeTertiary rounded transition-colors flex items-center gap-2"
+              className="w-full text-left px-3 py-2 text-sm text-brandRed hover:bg-orange-500 hover:text-white rounded transition-colors flex items-center gap-2"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M2 4H3.33333H14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -82,7 +82,7 @@ export default function TransactionActions({ transaction, onEdit, onDelete }: Tr
             <div className="flex gap-2">
               <button
                 onClick={() => setShowConfirm(false)}
-                className="flex-1 px-3 py-2 text-xs text-textBase bg-shapeTertiary rounded hover:bg-shapeSecondary transition-colors"
+                className="flex-1 px-3 py-2 text-xs text-textBase bg-shapeTertiary rounded hover:bg-orange-500 hover:text-white transition-colors"
               >
                 Cancelar
               </button>
@@ -91,7 +91,7 @@ export default function TransactionActions({ transaction, onEdit, onDelete }: Tr
                   onDelete(transaction.id!)
                   setShowConfirm(false)
                 }}
-                className="flex-1 px-3 py-2 text-xs text-white bg-brandRed rounded hover:bg-red-600 transition-colors"
+                className="flex-1 px-3 py-2 text-xs text-white bg-brandRed rounded hover:bg-orange-600 transition-colors"
               >
                 Excluir
               </button>
