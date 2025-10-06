@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import Summary from "./Summary";
@@ -8,6 +9,7 @@ import { useIndexedDB } from "../hooks/useIndexedDB";
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showNewTransactionModal, setShowNewTransactionModal] = useState(false);
+  const location = useLocation();
   
   // Hook para integração com IndexedDB
   const { getTransactions, isReady, getCategories } = useIndexedDB();
@@ -92,8 +94,11 @@ const Layout = () => {
     // Implementar lógica de salvamento
   };
 
+  const isHomePage = location.pathname === '/';
+  const isTransactionsPage = location.pathname === '/transactions';
+
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen bg-gray-900 overflow-hidden">
       {/* Mobile sidebar overlay */}
       {isSidebarOpen && (
         <div 
@@ -105,7 +110,7 @@ const Layout = () => {
       {/* Mobile menu button */}
       <button
         onClick={() => setIsSidebarOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-gray-800 rounded-lg shadow-md border border-gray-700"
       >
         <svg 
           width="24" 
@@ -116,7 +121,7 @@ const Layout = () => {
           strokeWidth="2" 
           strokeLinecap="round" 
           strokeLinejoin="round"
-          className="text-gray-700"
+          className="text-gray-300"
         >
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -125,11 +130,7 @@ const Layout = () => {
       </button>
       
       {/* Sidebar */}
-      <div className={`
-        fixed lg:relative lg:flex flex-col w-64 bg-white border-r border-gray-200 z-50 h-full
-        transform transition-transform duration-300 ease-in-out
-        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
+      <div className={`fixed lg:relative lg:flex lg:flex-col w-64 bg-gray-800 border-r border-gray-700 z-50 h-full transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <Sidebar onCloseMobile={() => setIsSidebarOpen(false)} />
       </div>
       
@@ -142,14 +143,20 @@ const Layout = () => {
             onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
           />
           <main className="flex-1">
-            <Summary />
-            <Transactions 
-              transactions={transactions}
-              onEdit={handleEditTransaction}
-              onDelete={handleDeleteTransaction}
-              onSearch={handleSearch}
-              categories={categories}
-            />
+            <Outlet />
+            {/* Conteúdo original na home */}
+            {isHomePage && (
+              <div className="p-6 space-y-6">
+                <Summary />
+                <Transactions 
+                  transactions={transactions}
+                  onEdit={handleEditTransaction}
+                  onDelete={handleDeleteTransaction}
+                  onSearch={handleSearch}
+                  categories={categories}
+                />
+              </div>
+            )}
           </main>
         </div>
       </div>
