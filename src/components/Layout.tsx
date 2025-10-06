@@ -23,7 +23,7 @@ const Layout = ({ currentPage, setCurrentPage }) => {
           const parsedTransactions = JSON.parse(transactionStore);
           const transactionsWithDate = parsedTransactions.map(transaction => ({
             ...transaction,
-            date: transaction.date || new Date().toISOString()
+            date: transaction.date || new Date().toJSON()
           }));
           setTransactions(transactionsWithDate);
         }
@@ -45,7 +45,7 @@ const Layout = ({ currentPage, setCurrentPage }) => {
         {
           ...transaction,
           id: Date.now().toString(),
-          date: transaction.date || new Date().toISOString()
+          date: transaction.date || new Date().toJSON()
         },
         ...transactions
       ];
@@ -70,12 +70,6 @@ const Layout = ({ currentPage, setCurrentPage }) => {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-gray-300">Transações</h2>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                Nova Transação
-              </button>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -242,7 +236,7 @@ const Layout = ({ currentPage, setCurrentPage }) => {
       </button>
 
       {/* Sidebar */}
-      <div className={`fixed lg:static inset-0 z-40 lg:z-auto transform ${
+      <div className={`fixed lg:static inset-0 z-40 lg:transform transform ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       } transition-transform duration-300 ease-in-out bg-gray-800 border-r border-gray-700 lg:block w-64 min-h-screen`}>
         <Sidebar currentPage={currentPage} setCurrentPage={setCurrentPage} />
@@ -258,7 +252,12 @@ const Layout = ({ currentPage, setCurrentPage }) => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col lg:ml-0">
-        <Header />
+        <Header 
+          onNewTransaction={() => setIsModalOpen(true)}
+          onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+          showMenuButton={true}
+          isMobile={false}
+        />
         <main className="flex-1 p-6 overflow-auto">
           {renderContent()}
         </main>
