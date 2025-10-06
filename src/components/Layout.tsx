@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Menu, X } from "lucide-react"
 import Sidebar from "./Sidebar"
 import Header from "./Header"
@@ -48,6 +48,15 @@ const Layout: React.FC = () => {
     deleteBudget,
     isReady
   } = useIndexedDB()
+
+  useEffect(() => {
+    if (isReady) {
+      loadTransactions()
+      loadCategories()
+      loadBudgets()
+      initializeDefaultCategories()
+    }
+  }, [isReady])
 
   const initializeDefaultCategories = async () => {
     try {
