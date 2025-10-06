@@ -1,154 +1,158 @@
 import React, { useState, useEffect } from 'react';
-import { X, TrendingUp, TrendingDown } from 'lucide-react';
 
-interface Transaction {
-  id?: number;
-  description: string;
-  amount: number;
-  type: 'income' | 'outcome';
-  category: string;
-  createdAt: Date;
-}
+// SVG inline para X (sem dependência externa)
+const XIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M18 6L6 18M6 6l12 12"/>
+  </svg>
+);
 
-interface NewTransactionModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (transaction: Omit<Transaction, 'id' | 'createdAt'>) => void;
-}
+// SVG inline para seta para cima (entrada)
+const TrendingUpIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+    <polyline points="17 6 23 6 23 12"/>
+  </svg>
+);
 
-const NewTransactionModal: React.FC<NewTransactionModalProps> = ({ isOpen, onClose, onSave }) => {
+// SVG inline para seta para baixo (saída)
+const TrendingDownIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+    <polyline points="17 18 23 18 23 12"/>
+  </svg>
+);
+
+const NewTransactionModal = ({ isOpen, onClose, onSave }) => {
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
-  const [type, setType] = useState<'income' | 'outcome'>('income');
-  const [category, setCategory] = useState('');
-  const [categories, setCategories] = useState<string[]>([]);
+  const [type, setType] = useState('income');
+  const [category, setCategory] = useState('alimentacao');
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Load categories from IndexedDB
   useEffect(() => {
-    // Carregar categorias do IndexedDB
     const loadCategories = async () => {
       try {
-        const db = await openDatabase();
-        const transaction = db.transaction(['categories'], 'readonly');
-        const store = transaction.objectStore('categories');
-        const request = store.getAll();
+        const request = indexedDB.open('dtmoney', 1);
         
-        request.onsuccess = () => {
-          const categoryList = request.result.map((cat: any) => cat.name);
-          setCategories(categoryList);
-          if (categoryList.length > 0) {
-            setCategory(categoryList[0]);
-          }
+        request.onsuccess = (event) => {
+          const db = event.target.result;
+          const transaction = db.transaction(['categories'], 'readonly');
+          const store = transaction.objectStore('categories');
+          const getAllRequest = store.getAll();
+          
+          getAllRequest.onsuccess = () => {
+            const defaultCategories = [
+              { id: 'alimentacao', name: 'Alimentação', color: '#10b981' },
+              { id: 'transporte', name: 'Transporte', color: '#f59e0b' },
+              { id: 'moradia', name: 'Moradia', color: '#3b82f6' },
+              { id: 'lazer', name: 'Lazer', color: '#8b5cf6' },
+              { id: 'saude', name: 'Saúde', color: '#ef4444' },
+              { id: 'educacao', name: 'Educação', color: '#06b6d4' },
+              { id: 'outros', name: 'Outros', color: '#6b7280' }
+            ];
+            
+            if (getAllRequest.result.length > 0) {
+              setCategories(getAllRequest.result);
+            } else {
+              setCategories(defaultCategories);
+            }
+          };
         };
       } catch (error) {
-        console.error('Erro ao carregar categorias:', error);
+        console.error('Error loading categories:', error);
+        const defaultCategories = [
+          { id: 'alimentacao', name: 'Alimentação', color: '#10b981' },
+          { id: 'transporte', name: 'Transporte', color: '#f59e0b' },
+          { id: 'moradia', name: 'Moradia', color: '#3b82f6' },
+          { id: 'lazer', name: 'Lazer', color: '#8b5cf6' },
+          { id: 'saude', name: 'Saúde', color: '#ef4444' },
+          { id: 'educacao', name: 'Educação', color: '#06b6d4' },
+          { id: 'outros', name: 'Outros', color: '#6b7280' }
+        ];
+        setCategories(defaultCategories);
       }
     };
 
-    loadCategories();
-  }, []);
-
-  useEffect(() => {
     if (isOpen) {
-      setDescription('');
-      setAmount('');
-      setType('income');
-      setCategory('');
+      loadCategories();
     }
   }, [isOpen]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!description || !amount || !category) {
-      return;
-    }
-
-    const transactionAmount = parseFloat(amount.replace(',', '.'));
+    if (!description || !amount) return;
     
-    if (isNaN(transactionAmount) || transactionAmount <= 0) {
-      return;
-    }
-
-    onSave({
+    setIsLoading(true);
+    
+    const transaction = {
+      id: Date.now().toString(),
       description,
-      amount: transactionAmount,
+      amount: type === 'outcome' ? -Math.abs(parseFloat(amount)) : parseFloat(amount),
       type,
-      category
-    });
+      category,
+      date: new Date().toISOString(),
+    };
 
-    onClose();
-  };
-
-  const openDatabase = (): Promise<IDBDatabase> => {
-    return new Promise((resolve, reject) => {
+    try {
       const request = indexedDB.open('dtmoney', 1);
-
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve(request.result);
-
-      request.onupgradeneeded = (event: any) => {
+      
+      request.onsuccess = (event) => {
         const db = event.target.result;
-
-        if (!db.objectStoreNames.contains('transactions')) {
-          db.createObjectStore('transactions', { keyPath: 'id', autoIncrement: true });
-        }
-        if (!db.objectStoreNames.contains('categories')) {
-          db.createObjectStore('categories', { keyPath: 'id', autoIncrement: true });
-        }
+        const transaction = db.transaction(['transactions'], 'readwrite');
+        const store = transaction.objectStore('transactions');
+        
+        store.add(transaction);
+        
+        transaction.oncomplete = () => {
+          onSave(transaction);
+          // Reset form
+          setDescription('');
+          setAmount('');
+          setType('income');
+          setCategory('alimentacao');
+          setIsLoading(false);
+          onClose();
+        };
+        
+        transaction.onerror = () => {
+          console.error('Error saving transaction');
+          setIsLoading(false);
+        };
       };
-    });
+      
+      request.onerror = () => {
+        console.error('Error opening database');
+        setIsLoading(false);
+      };
+    } catch (error) {
+      console.error('Error:', error);
+      setIsLoading(false);
+    }
   };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-gray-900 rounded-lg p-6 w-full max-w-md border border-gray-700 shadow-xl">
+      <div className="bg-gray-900 rounded-lg p-6 w-full max-w-md border border-gray-700">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-xl font-bold text-white">Nova Transação</h2>
-            <p className="text-gray-400 text-sm mt-1">Adicione uma nova entrada ou saída</p>
+            <p className="text-sm text-gray-400 mt-1">Adicione uma nova entrada ou saída</p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors p-1"
+            className="text-gray-400 hover:text-white transition-colors"
           >
-            <X className="w-5 h-5" />
+            <XIcon />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Descrição
-            </label>
-            <input
-              type="text"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="Ex: Salário, Aluguel, etc."
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Valor
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-2.5 text-gray-400 text-lg">R$</span>
-              <input
-                type="text"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="w-full pl-8 pr-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="0,00"
-                required
-              />
-            </div>
-          </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Tipo
@@ -157,28 +161,58 @@ const NewTransactionModal: React.FC<NewTransactionModalProps> = ({ isOpen, onClo
               <button
                 type="button"
                 onClick={() => setType('income')}
-                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md border transition-colors ${
+                className={`flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-all ${
                   type === 'income'
-                    ? 'bg-green-600 border-green-600 text-white'
-                    : 'bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700'
+                    ? 'bg-green-600 text-white border-2 border-green-600'
+                    : 'bg-gray-800 text-gray-300 border-2 border-gray-600 hover:border-gray-500'
                 }`}
               >
-                <TrendingUp className="w-4 h-4" />
+                <TrendingUpIcon />
                 Entrada
               </button>
               <button
                 type="button"
                 onClick={() => setType('outcome')}
-                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md border transition-colors ${
+                className={`flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-all ${
                   type === 'outcome'
-                    ? 'bg-red-600 border-red-600 text-white'
-                    : 'bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700'
+                    ? 'bg-red-600 text-white border-2 border-red-600'
+                    : 'bg-gray-800 text-gray-300 border-2 border-gray-600 hover:border-gray-500'
                 }`}
               >
-                <TrendingDown className="w-4 h-4" />
+                <TrendingDownIcon />
                 Saída
               </button>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Descrição
+            </label>
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Ex: Salário, Compras no mercado..."
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Valor
+            </label>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="R$ 0,00"
+              step="0.01"
+              min="0"
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              required
+            />
           </div>
 
           <div>
@@ -188,13 +222,11 @@ const NewTransactionModal: React.FC<NewTransactionModalProps> = ({ isOpen, onClo
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              required
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             >
-              <option value="" className="bg-gray-800">Selecione uma categoria</option>
               {categories.map((cat) => (
-                <option key={cat} value={cat} className="bg-gray-800">
-                  {cat}
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
                 </option>
               ))}
             </select>
@@ -204,15 +236,16 @@ const NewTransactionModal: React.FC<NewTransactionModalProps> = ({ isOpen, onClo
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors"
+              className="flex-1 py-3 px-4 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
+              disabled={isLoading}
+              className="flex-1 py-3 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Salvar
+              {isLoading ? 'Salvando...' : 'Salvar'}
             </button>
           </div>
         </form>
