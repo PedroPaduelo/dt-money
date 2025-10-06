@@ -4,6 +4,7 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import Summary from "./Summary";
 import Transactions from "./Transactions";
+import NewTransactionModal from "./NewTransactionModal";
 import { useIndexedDB } from "../hooks/useIndexedDB";
 
 const Layout = () => {
