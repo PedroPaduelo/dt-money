@@ -3,7 +3,7 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import Summary from "./Summary";
 import NewTransactionModal from "./NewTransactionModal";
-import TransactionsTable from "./TransactionsTable";
+import Transactions from "./Transactions";
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -18,6 +18,43 @@ const Layout = () => {
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
   }, []);
+
+  // Mock data for demonstration - você pode substituir com dados reais
+  const mockTransactions = [
+    {
+      id: '1',
+      description: 'Salário',
+      price: 5000,
+      category: 'Salário',
+      date: new Date().toISOString(),
+      type: 'income' as const
+    },
+    {
+      id: '2', 
+      description: 'Aluguel',
+      price: 1500,
+      category: 'Moradia',
+      date: new Date().toISOString(),
+      type: 'outcome' as const
+    }
+  ];
+
+  const mockCategories = ['Salário', 'Alimentação', 'Moradia', 'Transporte', 'Lazer'];
+
+  const handleEditTransaction = (transaction: any) => {
+    console.log('Edit transaction:', transaction);
+    // Implementar lógica de edição
+  };
+
+  const handleDeleteTransaction = (id: string) => {
+    console.log('Delete transaction:', id);
+    // Implementar lógica de exclusão
+  };
+
+  const handleSearch = (filters: any) => {
+    console.log('Search filters:', filters);
+    // Implementar lógica de busca
+  };
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -70,7 +107,13 @@ const Layout = () => {
           />
           <main className="flex-1">
             <Summary />
-            <TransactionsTable />
+            <Transactions 
+              transactions={mockTransactions}
+              onEdit={handleEditTransaction}
+              onDelete={handleDeleteTransaction}
+              onSearch={handleSearch}
+              categories={mockCategories}
+            />
           </main>
         </div>
       </div>
