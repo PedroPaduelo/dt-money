@@ -24,9 +24,9 @@ function Header({ onNewTransaction, onLoadMockData }: HeaderProps) {
 
   const getVariationColor = (pctChange: string) => {
     const change = parseFloat(pctChange);
-    if (change > 0) return 'text-green-600';
-    if (change < 0) return 'text-red-600';
-    return 'text-gray-600';
+    if (change > 0) return 'text-green-500';
+    if (change < 0) return 'text-red-500';
+    return 'text-gray-500';
   };
 
   const getVariationArrow = (pctChange: string) => {
