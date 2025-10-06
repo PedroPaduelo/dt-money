@@ -19,7 +19,7 @@ interface TransactionsProps {
 
 function Transactions({ transactions, onEdit, onDelete, onSearch, categories }: TransactionsProps) {
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 10
+  const itemsPerPage = 5
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -78,7 +78,7 @@ function Transactions({ transactions, onEdit, onDelete, onSearch, categories }: 
 
       <div className="bg-shapeSecondary rounded-lg">
         <div className="p-5 border-b border-shapeTertiary">
-          <div className="grid grid-cols-[1fr_200px_240px_92px_60px] gap-2">
+          <div className="grid grid-cols-[1fr_200px_92px_60px] gap-2">
             <span className="text-textBase text-sm">Descrição</span>
             <span className="text-textBase text-sm">Preço</span>
             <span className="text-textBase text-sm">Categoria</span>
@@ -95,9 +95,9 @@ function Transactions({ transactions, onEdit, onDelete, onSearch, categories }: 
           paginatedTransactions.map((transaction) => (
 
             <div key={transaction.id} className="p-5 border-b border-shapeTertiary">
-              <div className="grid grid-cols-[1fr_200px_92px_60px] gap-2 items-center">
+              <div className="grid grid-cols-[1fr_92px_60px] gap-2 items-center">
                 <span className="text-textBase text-sm">{transaction.description}</span>
-                <span className={`text-sm ${transaction.price > 0 ? 'text-ignitLight' : 'text-brandRed'}`}>
+                <span className={`text-sm ${transaction.price > 0 ? 'text-igniteLight' : 'text-brandRed'}`}>
                   {formatCurrency(transaction.price)}
                 </span>
                 <span className="text-textBase text-sm">{transaction.category}</span>
@@ -125,8 +125,8 @@ function Transactions({ transactions, onEdit, onDelete, onSearch, categories }: 
               disabled={currentPage === 1}
               className={`p-2 rounded-lg transition-colors ${
                 currentPage === 1
-                ? 'text-gray500 cursor-not-allowed'
-                : 'text-gray300 hover:text-white hover:bg-orange-500'
+                  ? 'text-gray500 cursor-not-allowed'
+                  : 'text-gray300 hover:text-white hover:bg-orange-500'
               }`}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -141,8 +141,8 @@ function Transactions({ transactions, onEdit, onDelete, onSearch, categories }: 
                   onClick={() => handlePageChange(page)}
                   className={`w-10 h-10 rounded-lg font-medium transition-colors ${
                     page === currentPage
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-shapeTertiary text-gray300 hover:bg-orange-500 hover:text-white'
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-shapeTertiary text-gray300 hover:bg-orange-500 hover:text-white'
                   }`}
                 >
                   {page}
@@ -155,8 +155,8 @@ function Transactions({ transactions, onEdit, onDelete, onSearch, categories }: 
               disabled={currentPage === totalPages}
               className={`p-2 rounded-lg transition-colors ${
                 currentPage === totalPages
-                ? 'text-gray500 cursor-not-allowed'
-                : 'text-gray300 hover:text-white hover:bg-orange-500'
+                  ? 'text-gray500 cursor-not-allowed'
+                  : 'text-gray300 hover:text-white hover:bg-orange-500'
               }`}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
