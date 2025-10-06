@@ -1,61 +1,142 @@
-interface SummaryProps {
-  income: number
-  outcome: number
-  total: number
+import React, { useState, useEffect } from 'react';
+import { ArrowUpCircle, ArrowDownCircle, DollarSign } from 'lucide-react';
+
+interface Transaction {
+  id: number;
+  description: string;
+  amount: number;
+  type: 'income' | 'outcome';
+  category: string;
+  createdAt: Date;
 }
 
-function Summary({ income, outcome, total }: SummaryProps) {
+const Summary: React.FC = () => {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [summary, setSummary] = useState({
+    income: 0,
+    outcome: 0,
+    total: 0
+  });
+
+  useEffect(() => {
+    const loadTransactions = async () => {
+      try {
+        const db = await openDatabase();
+        const transaction = db.transaction(['transactions'], 'readonly');
+        const store = transaction.objectStore('transactions');
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+          const transactionsList = request.result.map((t: any) => ({
+            ...t,
+            createdAt: new Date(t.createdAt)
+          }));
+          setTransactions(transactionsList);
+          calculateSummary(transactionsList);
+        };
+      } catch (error) {
+        console.error('Erro ao carregar transações:', error);
+      }
+    };
+
+    loadTransactions();
+  }, []);
+
+  const calculateSummary = (transactionsList: Transaction[]) => {
+    const income = transactionsList
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const outcome = transactionsList
+      .filter(t => t.type === 'outcome')
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    setSummary({
+      income,
+      outcome,
+      total: income - outcome
+    });
+  };
+
+  const openDatabase = (): Promise<IDBDatabase> => {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('dtmoney', 1);
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve(request.result);
+
+      request.onupgradeneeded = (event: any) => {
+        const db = event.target.result;
+
+        if (!db.objectStoreNames.contains('transactions')) {
+          db.createObjectStore('transactions', { keyPath: 'id', autoIncrement: true });
+        }
+        if (!db.objectStoreNames.contains('categories')) {
+          db.createObjectStore('categories', { keyPath: 'id', autoIncrement: true });
+        }
+      };
+    });
+  };
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
-    }).format(value)
-  }
+    }).format(value);
+  };
 
   return (
-    <section className="mt-8 grid grid-cols-3 gap-8">
-      <div className="bg-shapeTertiary rounded-lg p-6">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-textBase text-sm">Entradas</span>
-          <div className="w-8 h-8">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M16 0C7.16344 0 0 7.16344 0 16C0 24.8366 7.16344 32 16 32C24.8366 32 32 24.8366 32 16C32 7.16344 24.8366 0 16 0Z" fill="#00B37E"/>
-              <path d="M16 4C9.37258 4 4 9.37258 4 16C4 22.6274 9.37258 28 16 28C22.6274 28 28 22.6274 28 16C28 9.37258 22.6274 4 16 4Z" fill="#00875F"/>
-              <path d="M10 16L14 20L22 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      {/* Card de Entradas */}
+      <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-gray-400 text-sm font-medium">Entradas</p>
+            <p className="text-2xl font-bold text-green-400 mt-2">
+              {formatCurrency(summary.income)}
+            </p>
+          </div>
+          <div className="bg-green-900/30 p-3 rounded-full">
+            <ArrowUpCircle className="w-8 h-8 text-green-400" />
           </div>
         </div>
-        <strong className="text-headline-lg font-bold text-titles">{formatCurrency(income)}</strong>
       </div>
 
-      <div className="bg-shapeTertiary rounded-lg p-6">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-textBase text-sm">Saídas</span>
-          <div className="w-8 h-8">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M16 0C7.16344 0 0 7.16344 0 16C0 24.8366 7.16344 32 16 32C24.8366 32 32 24.8366 32 16C32 7.16344 24.8366 0 16 0Z" fill="#F75A68"/>
-              <path d="M16 4C9.37258 4 4 9.37258 4 16C4 22.6274 9.37258 28 16 28C22.6274 28 28 22.6274 28 16C28 9.37258 22.6274 4 16 4Z" fill="#F75A68"/>
-              <path d="M22 16L18 12L10 20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+      {/* Card de Saídas */}
+      <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-gray-400 text-sm font-medium">Saídas</p>
+            <p className="text-2xl font-bold text-red-400 mt-2">
+              {formatCurrency(summary.outcome)}
+            </p>
+          </div>
+          <div className="bg-red-900/30 p-3 rounded-full">
+            <ArrowDownCircle className="w-8 h-8 text-red-400" />
           </div>
         </div>
-        <strong className="text-headline-lg font-bold text-titles">{formatCurrency(outcome)}</strong>
       </div>
 
-      <div className="bg-igniteDark rounded-lg p-6">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-textBase text-sm">Total</span>
-          <div className="w-8 h-8">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M0 16C0 7.16344 7.16344 0 16 0C24.8366 0 32 7.16344 32 16C32 24.8366 24.8366 32 16 32C7.16344 32 0 24.8366 0 16Z" fill="#00B37E"/>
-              <path d="M11 21V11L21 16L11 21Z" fill="white"/>
-            </svg>
+      {/* Card do Total */}
+      <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-gray-400 text-sm font-medium">Total</p>
+            <p className={`text-2xl font-bold mt-2 ${
+              summary.total >= 0 ? 'text-green-400' : 'text-red-400'
+            }`}>
+              {formatCurrency(summary.total)}
+            </p>
+          </div>
+          <div className={`${summary.total >= 0 ? 'bg-green-900/30' : 'bg-red-900/30'} p-3 rounded-full`}>
+            <DollarSign className={`w-8 h-8 ${
+              summary.total >= 0 ? 'text-green-400' : 'text-red-400'
+            }`} />
           </div>
         </div>
-        <strong className="text-headline-lg font-bold text-titles">{formatCurrency(total)}</strong>
       </div>
-    </section>
-  )
-}
+    </div>
+  );
+};
 
-export default Summary
+export default Summary;
