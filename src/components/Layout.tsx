@@ -1,16 +1,20 @@
-import { useState, useEffect } from "react";
-import { Outlet, Link, useLocation } from "react-router-dom";
-import Sidebar from "./Sidebar";
-import Header from "./Header";
-import Summary from "./Summary";
-import Transactions from "./Transactions";
-import NewTransactionModal from "./NewTransactionModal";
-import { useIndexedDB } from "../hooks/useIndexedDB";
+import { useState, useEffect } from 'react';
+import Sidebar from './Sidebar';
+import Header from './components/Header';
+import Summary from './components/Summary';
+import Transactions from './components/Transactions';
+import NewTransactionModal from './components/NewTransactionModal';
+import { useIndexedDB } from '../hooks/useIndexedDB';
 
-const Layout = () => {
+interface LayoutProps {
+  currentPage: string;
+  setCurrentPage: (page: string) => void;
+  children: React.ReactNode;
+}
+
+const Layout = ({ currentPage, setCurrentPage, children }: LayoutProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showNewTransactionModal, setShowNewTransactionModal] = useState(false);
-  const location = useLocation();
   
   // Hook para integração com IndexedDB
   const { getTransactions, isReady, getCategories } = useIndexedDB();
@@ -95,9 +99,6 @@ const Layout = () => {
     // Implementar lógica de salvamento
   };
 
-  const isHomePage = location.pathname === '/';
-  const isTransactionsPage = location.pathname === '/transactions';
-
   return (
     <div className="flex h-screen bg-gray-900 overflow-hidden">
       {/* Mobile sidebar overlay */}
@@ -132,7 +133,11 @@ const Layout = () => {
       
       {/* Sidebar */}
       <div className={`fixed lg:relative lg:flex lg:flex-col w-64 bg-gray-800 border-r border-gray-700 z-50 h-full transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-        <Sidebar onCloseMobile={() => setIsSidebarOpen(false)} />
+        <Sidebar 
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          onCloseMobile={() => setIsSidebarOpen(false)} 
+        />
       </div>
       
       {/* Main content */}
@@ -143,21 +148,9 @@ const Layout = () => {
             isSidebarOpen={isSidebarOpen}
             onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
           />
+          
           <main className="flex-1">
-            <Outlet />
-            {/* Conteúdo original na home */}
-            {isHomePage && (
-              <div className="p-6 space-y-6">
-                <Summary />
-                <Transactions 
-                  transactions={transactions}
-                  onEdit={handleEditTransaction}
-                  onDelete={handleDeleteTransaction}
-                  onSearch={handleSearch}
-                  categories={categories}
-                />
-              </div>
-            )}
+            {children}
           </main>
         </div>
       </div>
