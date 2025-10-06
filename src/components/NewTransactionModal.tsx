@@ -81,7 +81,7 @@ export default function NewTransactionModal({ isOpen, onClose, onSave, editingTr
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-4 py-3 bg-shapeSecondary border border-shapeTertiary rounded-lg text-textBase placeholder-placeholder focus:outline-none focus:ring-2 focus:ring-igniteLight"
+              className="w-full px-4 py-3 bg-shapeSecondary border border-shapeTertiary rounded-lg text-textBase placeholder-placeholder focus:outline-none focus:ring-2 focus:ring-ignitLight"
               placeholder="Descrição"
               required
             />
@@ -93,7 +93,7 @@ export default function NewTransactionModal({ isOpen, onClose, onSave, editingTr
               type="number"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="w-full px-4 py-3 bg-shapeSecondary border border-shapeTertiary rounded-lg text-textBase placeholder-placeholder focus:outline-none focus:ring-2 focus:ring-igniteLight"
+              className="w-full px-4 py-3 bg-shapeSecondary border border-shapeTertiary rounded-lg text-textBase placeholder-placeholder focus:outline-none focus:ring-2 focus:ring-ignitLight"
               placeholder="0,00"
               step="0.01"
               required
@@ -106,7 +106,7 @@ export default function NewTransactionModal({ isOpen, onClose, onSave, editingTr
               type="text"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-4 py-3 bg-shapeSecondary border border-shapeTertiary rounded-lg text-textBase placeholder-placeholder focus:outline-none focus:ring-2 focus:ring-igniteLight"
+              className="w-full px-4 py-3 bg-shapeSecondary border border-shapeTertiary rounded-lg text-textBase placeholder-placeholder focus:outline-none focus:ring-2 focus:ring-ignitLight"
               placeholder="Categoria"
               required
             />
@@ -119,7 +119,7 @@ export default function NewTransactionModal({ isOpen, onClose, onSave, editingTr
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-4 py-3 bg-shapeSecondary border border-shapeTertiary rounded-lg text-textBase placeholder-placeholder focus:outline-none focus:ring-2 focus:ring-igniteLight"
+                className="w-full px-4 py-3 bg-shapeSecondary border border-shapeTertiary rounded-lg text-textBase placeholder-placeholder focus:outline-none focus:ring-2 focus:ring-ignitLight"
                 required
               />
             </div>
@@ -129,7 +129,7 @@ export default function NewTransactionModal({ isOpen, onClose, onSave, editingTr
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as 'income' | 'outcome')}
-                className="w-full px-4 py-3 bg-shapeSecondary border border-shapeTertiary rounded-lg text-textBase focus:outline-none focus:ring-2 focus:ring-igniteLight"
+                className="w-full px-4 py-3 bg-shapeSecondary border border-shapeTertiary rounded-lg text-textBase focus:outline-none focus:ring-2 focus:ring-ignitLight"
               >
                 <option value="income">Entrada</option>
                 <option value="outcome">Saída</option>
@@ -147,7 +147,7 @@ export default function NewTransactionModal({ isOpen, onClose, onSave, editingTr
             </button>
             <button
               type="submit"
-              className="flex-1 py-3 px-4 bg-igniteLight text-white rounded-lg hover:bg-igniteMid transition-colors"
+              className="flex-1 py-3 px-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
             >
               {editingTransaction ? 'Atualizar' : 'Cadastrar'}
             </button>
