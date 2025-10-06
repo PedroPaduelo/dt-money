@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import Summary from "./Summary";
-import NewTransactionModal from "./NewTransactionModal";
 import Transactions from "./Transactions";
 import { useIndexedDB } from "../hooks/useIndexedDB";
 
@@ -88,9 +87,9 @@ const Layout = () => {
     // Implementar lógica de busca
   };
 
-  const handleTransactionSuccess = () => {
-    // Recarregar dados quando uma nova transação for adicionada
-    loadData();
+  const handleTransactionSave = (transactionData: any) => {
+    console.log('Save transaction:', transactionData);
+    // Implementar lógica de salvamento
   };
 
   return (
@@ -158,8 +157,9 @@ const Layout = () => {
       {/* New Transaction Modal */}
       {showNewTransactionModal && (
         <NewTransactionModal 
+          isOpen={showNewTransactionModal}
           onClose={() => setShowNewTransactionModal(false)}
-          onSuccess={handleTransactionSuccess}
+          onSave={handleTransactionSave}
         />
       )}
     </div>
