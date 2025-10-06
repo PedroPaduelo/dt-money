@@ -1,5 +1,4 @@
-import { useEffect } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import Layout from './components/Layout'
 import { useIndexedDB } from './hooks/useIndexedDB'
 import Dashboard from './pages/Dashboard'
@@ -11,6 +10,7 @@ import SettingsPage from './pages/SettingsPage'
 
 function App() {
   const { isReady } = useIndexedDB()
+  const [currentPage, setCurrentPage] = useState('dashboard')
 
   useEffect(() => {
     if (isReady) {
@@ -18,19 +18,29 @@ function App() {
     }
   }, [isReady])
 
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'dashboard':
+        return <Dashboard />
+      case 'transactions':
+        return <TransactionsPage />
+      case 'summary':
+        return <SummaryPage />
+      case 'budgets':
+        return <BudgetsPage />
+      case 'reports':
+        return <ReportsPage />
+      case 'settings':
+        return <SettingsPage />
+      default:
+        return <Dashboard />
+    }
+  }
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="transactions" element={<TransactionsPage />} />
-          <Route path="summary" element={<SummaryPage />} />
-          <Route path="budgets" element={<BudgetsPage />} />
-          <Route path="reports" element={<ReportsPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <Layout currentPage={currentPage} setCurrentPage={setCurrentPage}>
+      {renderPage()}
+    </Layout>
   )
 }
 
