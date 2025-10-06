@@ -96,7 +96,7 @@ export default function SearchFilters({ onSearch, categories }: SearchFiltersPro
         <div className="flex gap-4">
           <button
             type="submit"
-            className="bg-igniteMid hover:bg-igniteLight transition-colors px-6 py-3 rounded-lg text-white font-medium text-sm"
+            className="bg-orange-500 hover:bg-orange-600 transition-colors px-6 py-3 rounded-lg text-white font-medium text-sm"
           >
             Filtrar
           </button>
