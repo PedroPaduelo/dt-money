@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import Header from './components/Header'
 import Summary from './components/Summary'
 import Transactions from './components/Transactions'
@@ -7,6 +8,7 @@ import BudgetManager from './components/BudgetManager'
 import TransactionChart from './components/TransactionChart'
 import { useIndexedDB } from './hooks/useIndexedDB'
 import { populateWithMockData } from './data/mockData'
+import { AppSidebar } from './components/app-sidebar'
 
 interface Transaction {
   id?: string
@@ -59,8 +61,8 @@ function App() {
       const existingCategories = await getCategories()
       if (existingCategories.length === 0) {
         const defaultCategories = [
-          { name: 'Salário', type: 'income' as const, color: '#00B37E' },
-          { name: 'Venda', type: 'income' as const, color: '#00B37E' },
+          { name: 'Salário', type: 'income' as const, color: '#00B37F' },
+          { name: 'Venda', type: 'income' as const, color: '#00B37F' },
           { name: 'Alimentação', type: 'outcome' as const, color: '#F75A68' },
           { name: 'Transporte', type: 'outcome' as const, color: '#F75A68' },
           { name: 'Casa', type: 'outcome' as const, color: '#F75A68' },
@@ -191,42 +193,51 @@ function App() {
   }, { income: 0, outcome: 0, total: 0 })
 
   return (
-    <div className="min-h-screen bg-shapePrimary">
-      <Header onNewTransaction={handleNewTransaction} onLoadMockData={handleLoadMockData} />
-      <main className="max-w-[1120px] mx-auto px-4">
-        <Summary
-          income={summary.income}
-          outcome={summary.outcome}
-          total={summary.total}
-        />
-        <TransactionChart transactions={transactions} />
-        <Transactions
-          transactions={filteredTransactions}
-          onEdit={handleEditTransaction}
-          onDelete={handleDeleteTransaction}
-          onSearch={handleSearch}
-          categories={categories}
-          key={JSON.stringify(filteredTransactions)}
-        />
-        <BudgetManager
-          budgets={budgets}
-          transactions={transactions}
-          onAddBudget={handleAddBudget}
-          onUpdateBudget={handleUpdateBudget}
-          onDeleteBudget={handleDeleteBudget}
-        />
-      </main>
+    <SidebarProvider>
+      <AppSidebar />
+      <div className="flex-1">
+        <main className="max-w-[1120px] mx-auto px-4">
+          <div className="mb-6">
+            <SidebarTrigger />
+          </div>
+          <Header 
+            onNewTransaction={handleNewTransaction} 
+            onLoadMockData={handleLoadMockData} 
+          />
+          <Summary
+            income={summary.income}
+            outcome={summary.outcome}
+            total={summary.total}
+          />
+          <TransactionChart transactions={transactions} />
+          <Transactions
+            transactions={filteredTransactions}
+            onEdit={handleEditTransaction}
+            onDelete={handleDeleteTransaction}
+            onSearch={handleSearch}
+            categories={categories}
+            key={JSON.stringify(filteredTransactions)}
+          />
+          <BudgetManager
+            budgets={budgets}
+            transactions={transactions}
+            onAddBudget={handleAddBudget}
+            onUpdateBudget={handleUpdateBudget}
+            onDeleteBudget={handleDeleteBudget}
+          />
+        </main>
 
-      <NewTransactionModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false)
-          setEditingTransaction(null)
-        }}
-        onSave={handleSaveTransaction}
-        editingTransaction={editingTransaction}
-      />
-    </div>
+        <NewTransactionModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false)
+            setEditingTransaction(null)
+          }}
+          onSave={handleSaveTransaction}
+          editingTransaction={editingTransaction}
+        />
+      </div>
+    </SidebarProvider>
   )
 }
 
