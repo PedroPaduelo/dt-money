@@ -31,9 +31,9 @@ function Header({ onNewTransaction, onLoadMockData }: HeaderProps) {
 
   const getVariationArrow = (pctChange: string) => {
     const change = parseFloat(pctChange);
-    if (change > 0) return '↑';
-    if (change < 0) return '↓';
-    return '→';
+    if (change > 0) return '▲';
+    if (change < 0) return '▼';
+    return '▲';
   };
 
   return (
@@ -52,17 +52,17 @@ function Header({ onNewTransaction, onLoadMockData }: HeaderProps) {
           </div>
 
           {/* Cotação do Dólar */}
-          <div className="flex items-center gap-4 py-2 px-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center gap-4 py-2 px-4 bg-gray-800 rounded-lg border border-gray-700">
             <div className="flex flex-col items-center">
-              <span className="text-xs text-gray-500 font-medium">USD/BRL</span>
+              <span className="text-xs text-gray-400 font-medium">USD/BRL</span>
               {loading ? (
-                <div className="text-sm text-gray-400">Carregando...</div>
+                <div className="text-sm text-gray-300">Carregando...</div>
               ) : error ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-red-500">Erro</span>
+                  <span className="text-sm text-red-400">Erro</span>
                   <button
                     onClick={refetch}
-                    className="text-xs text-blue-500 hover:text-blue-700 underline"
+                    className="text-xs text-blue-400 hover:text-blue-300 underline"
                     title="Tentar novamente"
                   >
                     Tentar
@@ -71,7 +71,7 @@ function Header({ onNewTransaction, onLoadMockData }: HeaderProps) {
               ) : exchangeRate ? (
                 <div className="flex items-center gap-3">
                   <div className="flex flex-col items-center">
-                    <span className="text-lg font-bold text-gray-800">
+                    <span className="text-lg font-bold text-gray-100">
                       {formatCurrency(exchangeRate.bid)}
                     </span>
                     <div className="flex items-center gap-1">
