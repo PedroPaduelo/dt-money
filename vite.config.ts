@@ -21,4 +21,10 @@ export default defineConfig({
       ],
     },
   },
+  server: {
+    host: true,
+    allowedHosts: [
+      'desk-acesso-ssh.mrt7ga.easypanel.host'
+    ]
+  }
 })
