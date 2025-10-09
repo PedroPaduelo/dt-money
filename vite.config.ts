@@ -24,6 +24,6 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
-    allowedHosts: ['desk-acesso-ssh.mrt7ga.easypanel.host', 'localhost', '127.0.0.1']
+    allowedHosts: ['desk-git-runner-back2.mrt7ga.easypanel.host','*', 'localhost', '127.0.0.1']
   }
 })
